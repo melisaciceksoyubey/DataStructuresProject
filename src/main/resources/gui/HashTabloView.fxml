@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="gui.HashTabloController"
+      styleClass="dialog-root" spacing="0">
+
+    <!-- Başlık -->
+    <Label text="Hash Tablosu  —  Separate Chaining Yontemi" styleClass="dialog-title"/>
+
+    <!-- İçerik -->
+    <TextArea fx:id="icerikArea"
+              editable="false"
+              VBox.vgrow="ALWAYS"
+              styleClass="hash-area"
+              wrapText="false">
+        <VBox.margin><Insets top="10" right="12" bottom="6" left="12"/></VBox.margin>
+    </TextArea>
+
+    <!-- Kapat butonu -->
+    <HBox alignment="CENTER_RIGHT" spacing="10">
+        <padding><Insets top="6" right="12" bottom="12" left="12"/></padding>
+        <Button text="Kapat" onAction="#kapat" styleClass="btn-secondary" cancelButton="true"/>
+    </HBox>
+
+</VBox>

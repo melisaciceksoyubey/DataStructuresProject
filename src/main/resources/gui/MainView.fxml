@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="gui.MainController"
+            styleClass="root-pane">
+
+    <!-- ═══════════════════ HEADER ═══════════════════ -->
+    <top>
+        <VBox>
+            <!-- Title bar -->
+            <HBox styleClass="header-bar" alignment="CENTER_LEFT" spacing="18">
+                <padding><Insets top="12" right="24" bottom="12" left="24"/></padding>
+                <Label text="⚓  LIMAN FERIBOT YONETIM SISTEMI" styleClass="app-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="rihtimDurumLabel" text="RIHTIM BOS" styleClass="status-chip-idle"/>
+                <Label fx:id="simSaatLabel" text="08:00" styleClass="sim-clock"/>
+            </HBox>
+
+            <!-- Toolbar -->
+            <HBox styleClass="toolbar-bar" alignment="CENTER_LEFT" spacing="8">
+                <padding><Insets top="8" right="20" bottom="8" left="20"/></padding>
+                <Button fx:id="btnBaslat" text="▶  Baslat"           onAction="#simulasyonBaslat" styleClass="btn-success"/>
+                <Button fx:id="btnDurdur" text="⏸  Duraklat"         onAction="#simDurdur"        styleClass="btn-warning" disable="true"/>
+                <Button fx:id="btnAdim"   text="⏭  Adim Adim"        onAction="#adimAdimIlerle"   styleClass="btn-primary"/>
+                <Button                   text="⚡  Tamamini Simule"  onAction="#tamaminSimuleEt"  styleClass="btn-primary"/>
+                <Button                   text="⊞  Hash Tablosu"      onAction="#hashTabloGoster"  styleClass="btn-secondary"/>
+                <Button                   text="↺  Sifirla"           onAction="#temizle"          styleClass="btn-danger"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="08:00" styleClass="progress-edge-label"/>
+                <ProgressBar fx:id="simProgress" progress="0" prefWidth="200" prefHeight="14" styleClass="sim-progressbar"/>
+                <Label text="20:00" styleClass="progress-edge-label"/>
+                <Label fx:id="surePctLabel" text="0%" styleClass="pct-label"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- ═══════════════════ LOG SIDEBAR (SAG) ═══════════════════ -->
+    <right>
+        <VBox styleClass="log-sidebar" prefWidth="295">
+            <Label text="  ◉  CANLI LOG" styleClass="log-sidebar-header"/>
+            <ListView fx:id="logListesi" VBox.vgrow="ALWAYS" styleClass="log-list"/>
+        </VBox>
+    </right>
+
+    <!-- ═══════════════════ MERKEZ ═══════════════════ -->
+    <center>
+        <SplitPane dividerPositions="0.55" styleClass="main-split">
+
+            <!-- ── SOL: Feribot Sahnesi ── -->
+            <VBox styleClass="panel-section" spacing="8">
+                <padding><Insets top="10" right="8" bottom="10" left="10"/></padding>
+
+                <!-- Feribot bilgi satiri -->
+                <HBox styleClass="ferry-header-bar" alignment="CENTER" spacing="32">
+                    <VBox alignment="CENTER" spacing="2">
+                        <Label text="SEFER NO" styleClass="ferry-info-lbl"/>
+                        <Label fx:id="seferNoLabel" text="---" styleClass="ferry-info-val"/>
+                    </VBox>
+                    <Label text="|" styleClass="ferry-divider"/>
+                    <VBox alignment="CENTER" spacing="2">
+                        <Label text="FERIBOT NO" styleClass="ferry-info-lbl"/>
+                        <Label fx:id="feribotNoLabel" text="---" styleClass="ferry-info-val"/>
+                    </VBox>
+                    <Label text="|" styleClass="ferry-divider"/>
+                    <VBox alignment="CENTER" spacing="2">
+                        <Label text="DURUM" styleClass="ferry-info-lbl"/>
+                        <Label fx:id="feribotDurumLabel" text="Rihtim Bos" styleClass="ferry-status-idle"/>
+                    </VBox>
+                </HBox>
+
+                <!-- Ferry Scene: Canvas (arka) + Deck Overlay (on) -->
+                <StackPane fx:id="ferryScenePane" VBox.vgrow="ALWAYS" styleClass="ferry-scene-pane">
+
+                    <!-- Deck overlay: otomatik olarak canvas üstüne bindirilecek -->
+                    <VBox styleClass="deck-card" spacing="12" alignment="CENTER">
+                        <StackPane.margin><Insets top="125" right="10" bottom="10" left="10"/></StackPane.margin>
+
+                        <!-- Ust Kat -->
+                        <VBox styleClass="deck-section-upper" spacing="8" VBox.vgrow="ALWAYS">
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <Label text="UST KAT  —  Otomobil" styleClass="deck-title-upper"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="ustKatLabel" text="0 / 5" styleClass="deck-count"/>
+                            </HBox>
+                            <HBox fx:id="ustKatBox" spacing="6" styleClass="slots-row" VBox.vgrow="ALWAYS"/>
+                            <ProgressBar fx:id="ustKatProgress" progress="0" maxWidth="Infinity"
+                                         prefHeight="18" styleClass="deck-bar-upper-big"/>
+                        </VBox>
+
+                        <Separator styleClass="deck-separator"/>
+
+                        <!-- Giris Kati -->
+                        <VBox styleClass="deck-section-lower" spacing="8" VBox.vgrow="ALWAYS">
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <Label text="GIRIS KATI  —  Agir Vasita" styleClass="deck-title-lower"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="girisKatLabel" text="0 / 5" styleClass="deck-count"/>
+                            </HBox>
+                            <HBox fx:id="girisKatBox" spacing="6" styleClass="slots-row" VBox.vgrow="ALWAYS"/>
+                            <ProgressBar fx:id="girisKatProgress" progress="0" maxWidth="Infinity"
+                                         prefHeight="18" styleClass="deck-bar-lower-big"/>
+                        </VBox>
+
+                    </VBox>
+                </StackPane>
+            </VBox>
+
+            <!-- ── SAG: Kuyruklar + Form ── -->
+            <VBox styleClass="panel-section" spacing="10">
+                <padding><Insets top="10" right="10" bottom="10" left="8"/></padding>
+
+                <!-- Yukleme yollari -->
+                <HBox spacing="10" VBox.vgrow="ALWAYS">
+                    <VBox HBox.hgrow="ALWAYS" styleClass="queue-card" spacing="6">
+                        <Label fx:id="yol1BaslikLabel" text="1. YUKLEME YOLU  (0)" styleClass="queue-card-title"/>
+                        <ListView fx:id="yol1List" VBox.vgrow="ALWAYS" styleClass="queue-list"/>
+                    </VBox>
+                    <VBox HBox.hgrow="ALWAYS" styleClass="queue-card" spacing="6">
+                        <Label fx:id="yol2BaslikLabel" text="2. YUKLEME YOLU  (0)" styleClass="queue-card-title"/>
+                        <ListView fx:id="yol2List" VBox.vgrow="ALWAYS" styleClass="queue-list"/>
+                    </VBox>
+                </HBox>
+
+                <!-- Arac ekle formu -->
+                <VBox styleClass="form-card" spacing="10">
+                    <Label text="+ YENI ARAC EKLE" styleClass="form-card-title"/>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Plaka:" styleClass="form-label" minWidth="80"/>
+                        <TextField fx:id="plakaField" promptText="34 ABC 001"
+                                   HBox.hgrow="ALWAYS" styleClass="form-field"/>
+                    </HBox>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Gise Saati:" styleClass="form-label" minWidth="80"/>
+                        <TextField fx:id="saatField" promptText="9.30"
+                                   HBox.hgrow="ALWAYS" styleClass="form-field"/>
+                    </HBox>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Arac Tipi:" styleClass="form-label" minWidth="80"/>
+                        <ComboBox fx:id="tipBox" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                    </HBox>
+                    <Button text="Sisteme Ekle" onAction="#aracEkleInline"
+                            styleClass="btn-success" maxWidth="Infinity"/>
+                </VBox>
+
+            </VBox>
+        </SplitPane>
+    </center>
+
+    <!-- ═══════════════════ BOTTOM: TABLOLAR ═══════════════════ -->
+    <bottom>
+        <TabPane styleClass="data-tabs" prefHeight="175" tabClosingPolicy="UNAVAILABLE">
+
+            <Tab text="  Tum Araclar  ">
+                <TableView fx:id="aracTable" maxWidth="Infinity" maxHeight="Infinity">
+                    <columns>
+                        <TableColumn fx:id="colAracNo"    text="No"         prefWidth="50"/>
+                        <TableColumn fx:id="colPlaka"     text="Plaka"      prefWidth="130"/>
+                        <TableColumn fx:id="colTip"       text="Tip"        prefWidth="130"/>
+                        <TableColumn fx:id="colGiseSaati" text="Gise Saati" prefWidth="100"/>
+                        <TableColumn fx:id="colSeferNo"   text="Sefer No"   prefWidth="100"/>
+                        <TableColumn fx:id="colDurum"     text="Durum"      prefWidth="100"/>
+                    </columns>
+                    <placeholder>
+                        <Label text="Araclar yukleniyor..." styleClass="placeholder-label"/>
+                    </placeholder>
+                </TableView>
+            </Tab>
+
+            <Tab text="  Feribot Gecmisi  ">
+                <TableView fx:id="feribotTable" maxWidth="Infinity" maxHeight="Infinity">
+                    <columns>
+                        <TableColumn fx:id="colSefer"        text="Sefer"         prefWidth="80"/>
+                        <TableColumn fx:id="colFeribotNo"    text="No"            prefWidth="50"/>
+                        <TableColumn fx:id="colGiris"        text="Giris"         prefWidth="70"/>
+                        <TableColumn fx:id="colPlanKalkis"   text="Plan Kalkis"   prefWidth="90"/>
+                        <TableColumn fx:id="colGercekKalkis" text="Gercek Kalkis" prefWidth="100"/>
+                        <TableColumn fx:id="colGKat"         text="G.Kat"         prefWidth="60"/>
+                        <TableColumn fx:id="colUKat"         text="U.Kat"         prefWidth="60"/>
+                        <TableColumn fx:id="colGecikme"      text="Gecikme"       prefWidth="90"/>
+                        <TableColumn fx:id="colFeribotDurum" text="Durum"         prefWidth="80"/>
+                    </columns>
+                    <placeholder>
+                        <Label text="Feribotlar yukleniyor..." styleClass="placeholder-label"/>
+                    </placeholder>
+                </TableView>
+            </Tab>
+
+        </TabPane>
+    </bottom>
+
+</BorderPane>

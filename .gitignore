@@ -1,0 +1,7 @@
+target/
+*.class
+CLAUDE.md
+.idea/
+*.iml
+out/
+.vscode/
